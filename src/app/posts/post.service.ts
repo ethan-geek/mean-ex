@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { Observable, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Post } from './post.model';
@@ -11,7 +12,7 @@ export class PostService {
   private posts: Post[] = [];
   private postsUpdated = new Subject<Post[]>();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private router: Router) {}
 
   getPosts(): void {
     // return [...this.posts];
@@ -40,10 +41,14 @@ export class PostService {
 
   getPost(
     id: string
-  ): Observable<{ _id: string; title: string; content: string }> {
-    return this.http.get<{ _id: string; title: string; content: string }>(
-      'http://localhost:3000/api/posts/' + id
-    );
+  ): Observable<{
+    message: string;
+    post: { _id: string; title: string; content: string };
+  }> {
+    return this.http.get<{
+      message: string;
+      post: { _id: string; title: string; content: string };
+    }>('http://localhost:3000/api/posts/' + id);
   }
   addPost(title: string, content: string): void {
     const post = {
@@ -61,6 +66,7 @@ export class PostService {
         post.id = data.postId;
         this.posts.push(post);
         this.postsUpdated.next([...this.posts]);
+        this.router.navigate(['/']);
       });
   }
 
@@ -79,6 +85,7 @@ export class PostService {
         updatedPost[findIdx] = post;
         this.posts = updatedPost;
         this.postsUpdated.next([...this.posts]);
+        this.router.navigate(['/']);
       });
   }
 
