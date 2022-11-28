@@ -1,20 +1,49 @@
 const express = require("express");
+const multer = require("multer");
+
 const Post = require("../models/post");
 
 const router = express.Router();
 
-router.post("", (req, res, next) => {
-  const post = new Post({
-    title: req.body.title,
-    content: req.body.content,
-  });
-  post.save().then((createdPost) => {
-    res.status(201).json({
-      message: "Post added sucessfully!",
-      postId: createdPost._id,
-    });
-  });
+const MIME_TYPE = {
+  "image/png": "png",
+  "image/jpeg": "jpeg",
+  "image/jpg": "jpg",
+};
+
+const storage = multer.diskStorage({
+  destination: (req, file, callback) => {
+    const isValid = MIME_TYPE[file.mimetype];
+    const error = new Error("Invalid mime type!");
+    if (!!isValid) {
+      error = null;
+    }
+    // server.js 파일의 상대 경로로 정의 즉 server.js 파일이 저장된 경로에 상대적으로 지정
+    callback(error, "backend/images");
+  },
+  filename: (req, file, callback) => {
+    const name = file.originalname.toLowerCase().split(" ").join("-");
+    const ext = MIME_TYPE[file.mimetype];
+    callback(null, name + "-" + Date.now() + "." + ext);
+  },
 });
+
+router.post(
+  "",
+  multer({ storage: storage }).single("image"),
+  (req, res, next) => {
+    const post = new Post({
+      title: req.body.title,
+      content: req.body.content,
+    });
+    post.save().then((createdPost) => {
+      res.status(201).json({
+        message: "Post added sucessfully!",
+        postId: createdPost._id,
+      });
+    });
+  }
+);
 
 router.put("/:id", (req, res, next) => {
   const post = new Post({
