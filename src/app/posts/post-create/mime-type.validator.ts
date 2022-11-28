@@ -1,10 +1,14 @@
 import { AbstractControl } from '@angular/forms';
-import { Observable, Observer } from 'rxjs';
+import { Observable, Observer, of } from 'rxjs';
 
 // Promise<{[key: string]}> 대괄호는 배열을 의미하지 않고 동적 프로퍼티 이름이라는 것을 의미
 export const mimeType = (
   control: AbstractControl
 ): Promise<{ [key: string]: any }> | Observable<{ [key: string]: any }> => {
+  if (typeof control.value === 'string') {
+    // of는 옵저버블을 추가하고 생성하는 빠르고 쉬운 방법
+    return of(null);
+  }
   const file = control.value as File;
   const fileReader = new FileReader();
   // 옵저버는 간단히 옵저버블이 데이터를 내보내는 시점을 제어하는 도구
