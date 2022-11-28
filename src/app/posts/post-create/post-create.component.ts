@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 
 import { Post } from '../post.model';
@@ -15,6 +15,7 @@ export class PostCreateComponent implements OnInit {
   enteredContent = '';
   post: Post | null;
   isLoading = false;
+  form: FormGroup;
 
   private mode = 'create';
   private postId: string;
@@ -25,6 +26,12 @@ export class PostCreateComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.form = new FormGroup({
+      title: new FormControl(null, {
+        validators: [Validators.required, Validators.minLength(3)],
+      }),
+      content: new FormControl(null, { validators: [Validators.required] }),
+    });
     this.route.paramMap.subscribe((paramMap: ParamMap) => {
       if (paramMap.has('postId')) {
         this.mode = 'edit';
@@ -37,6 +44,10 @@ export class PostCreateComponent implements OnInit {
             title: data.post.title,
             content: data.post.content,
           } as Post;
+          this.form.setValue({
+            title: this.post.title,
+            content: this.post.content,
+          });
         });
       } else {
         this.mode = 'create';
@@ -44,12 +55,12 @@ export class PostCreateComponent implements OnInit {
       }
     });
   }
-  onSavePost(form: NgForm) {
-    if (form.invalid) {
+  onSavePost() {
+    if (this.form.invalid) {
       return;
     }
-    const title = form.value.title;
-    const content = form.value.content;
+    const title = this.form.value.title;
+    const content = this.form.value.content;
     this.isLoading = true;
     if (this.mode === 'create') {
       this.postService.addPost(title, content);
@@ -57,6 +68,8 @@ export class PostCreateComponent implements OnInit {
       this.postService.updatePost(this.postId, title, content);
     }
 
-    form.resetForm();
+    this.form.reset();
   }
+
+  onImagePicked(): void {}
 }
