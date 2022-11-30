@@ -45,6 +45,7 @@ export class AuthService {
           this.token = res.token;
           this.isAuthenticated = true;
           this.authStatusSubject.next(true);
+          this.router.navigate(['/']);
         }
       });
   }
@@ -53,5 +54,6 @@ export class AuthService {
     this.token = null;
     this.isAuthenticated = false;
     this.authStatusSubject.next(false);
+    this.router.navigate(['/']);
   }
 }
