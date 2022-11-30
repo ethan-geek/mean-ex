@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { Observable, Subject } from 'rxjs';
 import { AuthData } from './auth-data.model';
 
 @Injectable({
@@ -8,9 +9,14 @@ import { AuthData } from './auth-data.model';
 })
 export class AuthService {
   private token: string;
+  private authStatusSubject = new Subject<boolean>();
 
   getToken(): string {
     return this.token;
+  }
+
+  getAuthStatusSubject(): Observable<boolean> {
+    return this.authStatusSubject.asObservable();
   }
 
   constructor(private http: HttpClient, private router: Router) {}
@@ -31,6 +37,7 @@ export class AuthService {
       .post<{ token: string }>('http://localhost:3000/api/user/login', authData)
       .subscribe((res) => {
         this.token = res.token;
+        this.authStatusSubject.next(true);
       });
   }
 }
