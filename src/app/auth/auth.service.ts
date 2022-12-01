@@ -35,11 +35,15 @@ export class AuthService {
   createUser(email: string, password: string): void {
     const authData: AuthData = { email, password };
 
-    this.http
-      .post('http://localhost:3000/api/user/signup', authData)
-      .subscribe((res) => {
+    this.http.post('http://localhost:3000/api/user/signup', authData).subscribe(
+      (res) => {
         console.log(res);
-      });
+        this.router.navigate['/'];
+      },
+      (error) => {
+        this.authStatusSubject.next(false);
+      }
+    );
   }
 
   login(email: string, password: string): void {
@@ -49,28 +53,33 @@ export class AuthService {
         'http://localhost:3000/api/user/login',
         authData
       )
-      .subscribe((res) => {
-        if (!!res.token) {
-          const expiresInDuration = res.expiresIn;
+      .subscribe(
+        (res) => {
+          if (!!res.token) {
+            const expiresInDuration = res.expiresIn;
 
-          this.setAuthTimer(expiresInDuration);
+            this.setAuthTimer(expiresInDuration);
 
-          this.token = res.token;
-          this.userId = res.userId;
-          this.isAuthenticated = true;
-          this.authStatusSubject.next(true);
+            this.token = res.token;
+            this.userId = res.userId;
+            this.isAuthenticated = true;
+            this.authStatusSubject.next(true);
 
-          const now = new Date();
-          const expirationDate = new Date(
-            now.getTime() + expiresInDuration * 1000
-          );
-          console.log(expirationDate);
+            const now = new Date();
+            const expirationDate = new Date(
+              now.getTime() + expiresInDuration * 1000
+            );
+            console.log(expirationDate);
 
-          this.saveAuthData(this.token, expirationDate, res.userId);
+            this.saveAuthData(this.token, expirationDate, res.userId);
 
-          this.router.navigate(['/']);
+            this.router.navigate(['/']);
+          }
+        },
+        (error) => {
+          this.authStatusSubject.next(false);
         }
-      });
+      );
   }
 
   autoAuthUser(): void {
