@@ -40,13 +40,13 @@ export class AuthService {
   login(email: string, password: string): void {
     const authData: AuthData = { email, password };
     this.http
-      .post<{ token: string; expireIn: number }>(
+      .post<{ token: string; expiresIn: number }>(
         'http://localhost:3000/api/user/login',
         authData
       )
       .subscribe((res) => {
         if (!!res.token) {
-          const expiresInDuration = res.expireIn;
+          const expiresInDuration = res.expiresIn;
 
           this.setAuthTimer(expiresInDuration);
 
@@ -58,6 +58,8 @@ export class AuthService {
           const expirationDate = new Date(
             now.getTime() + expiresInDuration * 1000
           );
+          console.log(expirationDate);
+
           this.saveAuthData(this.token, expirationDate);
 
           this.router.navigate(['/']);
