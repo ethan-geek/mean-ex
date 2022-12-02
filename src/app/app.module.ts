@@ -15,21 +15,16 @@ import { ErrorInterceptor } from './error-interceptor';
 import { ErrorComponent } from './error/error.component';
 import { AppMaterialModule } from './app-material.module';
 import { AppPostsModule } from './posts/posts.module';
-import { AppAuthModule } from './auth/auth.module';
 
 @NgModule({
   declarations: [AppComponent, HeaderComponent, ErrorComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
-
     BrowserAnimationsModule,
-
     HttpClientModule,
-
     AppMaterialModule,
     AppPostsModule,
-    AppAuthModule,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },

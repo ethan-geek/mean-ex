@@ -22,12 +22,8 @@ const routes: Routes = [
     component: PostCreateComponent,
   },
   {
-    path: 'login',
-    component: LoginComponent,
-  },
-  {
-    path: 'signup',
-    component: SignupComponent,
+    path: 'auth',
+    loadChildren: './auth/auth.module#AuthModule',
   },
 ];
 
